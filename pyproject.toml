@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
-    { name = "Roman Myhun", email = "roman.myhun@example.com" }
+    { name = "Roman Myhun", email = "myhun59@gmail.com" }
 ]
 keywords = ["docusaurus", "documentation", "sync", "cli", "git"]
 classifiers = [

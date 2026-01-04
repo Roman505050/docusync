@@ -30,6 +30,7 @@ Perfect for:
 - 🎨 **Docusaurus Integration** - Auto-generates `_category_.json` files
 - 📋 **Multi-Repository Support** - Sync from unlimited GitHub repositories
 - 🔧 **Flexible Configuration** - JSON-based configuration with validation
+- 🔐 **Multiple Auth Methods** - Support for SSH keys and HTTPS with Personal Access Tokens
 - 📊 **Beautiful Output** - Rich console interface with progress indicators
 - 🧹 **Clean & Safe** - Automatic cleanup of temporary files
 - ✅ **Type-Safe** - Built with Pydantic for robust configuration
@@ -216,6 +217,9 @@ Array of repositories to sync:
 | `display_name` | `string` | Display name for the category |
 | `position` | `integer` | Sidebar position (must be unique) |
 | `description` | `string` | Category description for Docusaurus |
+| `protocol` | `string` | (Optional) Clone protocol: `"ssh"` or `"https"` |
+| `pat_token_env` | `string` | (Optional) Environment variable with PAT token for this repo |
+| `ssh_key_path` | `string` | (Optional) Path to SSH private key for this repo |
 
 #### `paths` (required)
 
@@ -230,6 +234,127 @@ Array of repositories to sync:
 |-------|------|-------------|
 | `clone_depth` | `integer` | Git clone depth (1 for shallow clone) |
 | `default_branches` | `array` | Default branches to try cloning |
+| `default_protocol` | `string` | Clone protocol: `"ssh"` or `"https"` (default: `"ssh"`) |
+| `default_ssh_key_path` | `string` | Default SSH private key path (optional, e.g., `~/.ssh/id_ed25519`) |
+| `default_pat_token_env` | `string` | Default environment variable name containing GitHub Personal Access Token (optional) |
+
+#### Authentication & Protocols
+
+**SSH Authentication (default):**
+- Uses `git@github.com:owner/repo.git` format
+- Requires SSH key setup with GitHub
+- Best for local development
+- Supports custom SSH keys per repository
+
+**HTTPS with PAT Token:**
+- Uses `https://github.com/owner/repo.git` format
+- Requires GitHub Personal Access Token
+- Best for CI/CD pipelines
+- Token is read from environment variable
+- Supports different tokens per repository
+
+**Example with HTTPS:**
+```json
+{
+  "git": {
+    "clone_depth": 1,
+    "default_branches": ["main", "master"],
+    "default_protocol": "https",
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
+  }
+}
+```
+
+Then set your token:
+```bash
+export GITHUB_PAT_TOKEN="ghp_your_token_here"
+```
+
+**Example with custom SSH keys:**
+```json
+{
+  "repositories": [
+    {
+      "github_path": "acme-corp/api-docs",
+      "protocol": "ssh",
+      "ssh_key_path": "~/.ssh/acme_corp_key",
+      ...
+    },
+    {
+      "github_path": "partner-org/service-docs",
+      "protocol": "ssh",
+      "ssh_key_path": "~/.ssh/partner_org_key",
+      ...
+    }
+  ],
+  "git": {
+    "default_protocol": "ssh",
+    "default_ssh_key_path": "~/.ssh/id_ed25519"
+  }
+}
+```
+
+**Per-repository protocol override:**
+```json
+{
+  "repositories": [
+    {
+      "github_path": "acme-corp/payment-processor",
+      "docs_path": "docs",
+      "display_name": "Payment Processor",
+      "position": 3,
+      "description": "Payment processing documentation",
+      "protocol": "https"
+    }
+  ]
+}
+```
+
+**Multiple organizations with different authentication:**
+```json
+{
+  "repositories": [
+    {
+      "github_path": "acme-corp/api-docs",
+      "display_name": "ACME API",
+      "protocol": "ssh",
+      "ssh_key_path": "~/.ssh/acme_corp_key",
+      ...
+    },
+    {
+      "github_path": "partner-org/service-docs",
+      "display_name": "Partner Service",
+      "protocol": "https",
+      "pat_token_env": "PARTNER_ORG_PAT_TOKEN",
+      ...
+    },
+    {
+      "github_path": "contractor/integration-docs",
+      "display_name": "Integration",
+      "protocol": "https",
+      "pat_token_env": "CONTRACTOR_PAT_TOKEN",
+      ...
+    }
+  ],
+  "git": {
+    "default_protocol": "ssh",
+    "default_ssh_key_path": "~/.ssh/id_ed25519",
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
+  }
+}
+```
+
+Then set individual credentials:
+```bash
+# For HTTPS repositories
+export PARTNER_ORG_PAT_TOKEN="ghp_partner_token"
+export CONTRACTOR_PAT_TOKEN="ghp_contractor_token"
+export GITHUB_PAT_TOKEN="ghp_default_token"
+```
+
+**Priority for authentication:**
+- **SSH:** Repository `ssh_key_path` → Global `default_ssh_key_path` → System default
+- **HTTPS:** Repository `pat_token_env` → Global `default_pat_token_env` → No token
 
 ## 🎨 Docusaurus Integration
 
@@ -368,7 +493,8 @@ uv run pytest --cov=docusync --cov-report=html
 ## 📋 Requirements
 
 - **Python** 3.12 or higher
-- **Git** with SSH access to GitHub repositories
+- **Git** installed on your system
+- **GitHub Access**: Either SSH keys configured OR Personal Access Token for HTTPS
 - **Docusaurus** 2.x or higher (for the target project)
 
 ## 🤝 Contributing

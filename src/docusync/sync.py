@@ -58,11 +58,14 @@ class RepositorySyncer:
         if repo_path.exists():
             self.file_manager.remove_directory(repo_path)
 
-        # Clone repository
+        # Clone repository with appropriate protocol, token, and SSH key
+        clone_url = repo.get_clone_url(self.config.git.default_protocol)
         self.git_manager.clone_repository(
-            clone_url=repo.clone_url,
+            clone_url=clone_url,
             destination=repo_path,
             depth=self.config.git.clone_depth,
+            pat_token_env=repo.pat_token_env,  # Repository-specific token
+            ssh_key_path=repo.ssh_key_path,  # Repository-specific SSH key
         )
 
         return repo_path
@@ -105,7 +108,10 @@ class DocuSync:
     def __init__(self, config: Config, verbose: bool = False) -> None:
         self.config = config
         USER_LOG.verbose = verbose
-        self.git_manager = GitManager()
+        self.git_manager = GitManager(
+            default_pat_token_env=config.git.pat_token_env,
+            default_ssh_key_path=config.git.default_ssh_key_path,
+        )
         self.file_manager = FileManager()
         self.md_fixer = MarkdownFixer()
         self.syncer = RepositorySyncer(

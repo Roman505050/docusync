@@ -1,5 +1,7 @@
 """Configuration handling for DocuSync."""
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -12,11 +14,33 @@ class Repository(BaseModel):
     display_name: str = Field(..., min_length=1)
     position: int = Field(..., ge=0)
     description: str
+    protocol: Literal["ssh", "https"] | None = None
+    pat_token_env: str | None = Field(
+        default=None,
+        description="Environment variable name containing GitHub PAT token for this specific repository"
+    )
+    ssh_key_path: str | None = Field(
+        default=None,
+        description="Path to SSH private key file for this specific repository"
+    )
+
+    def get_clone_url(self, default_protocol: str = "ssh") -> str:
+        """Get the GitHub clone URL based on protocol.
+        
+        :param default_protocol: Default protocol to use if not specified
+        :returns: Clone URL
+        """
+        protocol = self.protocol or default_protocol
+        
+        if protocol == "ssh":
+            return f"git@github.com:{self.github_path}.git"
+        else:  # https
+            return f"https://github.com/{self.github_path}.git"
 
     @property
     def clone_url(self) -> str:
-        """Get the GitHub SSH clone URL."""
-        return f"git@github.com:{self.github_path}.git"
+        """Get the GitHub clone URL (backwards compatibility)."""
+        return self.get_clone_url()
 
     @property
     def repo_name(self) -> str:
@@ -36,6 +60,15 @@ class GitConfig(BaseModel):
 
     clone_depth: int = Field(..., ge=1)
     default_branches: list[str] = Field(..., min_length=1)
+    default_protocol: Literal["ssh", "https"] = Field(default="ssh")
+    pat_token_env: str | None = Field(
+        default=None,
+        description="Environment variable name containing GitHub PAT token for HTTPS authentication"
+    )
+    default_ssh_key_path: str | None = Field(
+        default=None,
+        description="Default path to SSH private key file (e.g., ~/.ssh/id_ed25519)"
+    )
 
 
 class Config(BaseSettings):

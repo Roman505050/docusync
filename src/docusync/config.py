@@ -17,21 +17,21 @@ class Repository(BaseModel):
     protocol: Literal["ssh", "https"] | None = None
     pat_token_env: str | None = Field(
         default=None,
-        description="Environment variable name containing GitHub PAT token for this specific repository"
+        description="Environment variable name containing GitHub PAT token for this specific repository",
     )
     ssh_key_path: str | None = Field(
         default=None,
-        description="Path to SSH private key file for this specific repository"
+        description="Path to SSH private key file for this specific repository",
     )
 
     def get_clone_url(self, default_protocol: str = "ssh") -> str:
         """Get the GitHub clone URL based on protocol.
-        
+
         :param default_protocol: Default protocol to use if not specified
         :returns: Clone URL
         """
         protocol = self.protocol or default_protocol
-        
+
         if protocol == "ssh":
             return f"git@github.com:{self.github_path}.git"
         else:  # https
@@ -63,11 +63,11 @@ class GitConfig(BaseModel):
     default_protocol: Literal["ssh", "https"] = Field(default="ssh")
     default_pat_token_env: str | None = Field(
         default=None,
-        description="Default environment variable name containing GitHub PAT token for HTTPS authentication"
+        description="Default environment variable name containing GitHub PAT token for HTTPS authentication",
     )
     default_ssh_key_path: str | None = Field(
         default=None,
-        description="Default path to SSH private key file (e.g., ~/.ssh/id_ed25519)"
+        description="Default path to SSH private key file (e.g., ~/.ssh/id_ed25519)",
     )
 
 

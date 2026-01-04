@@ -18,7 +18,7 @@ class GitManager:
         default_ssh_key_path: str | None = None,
     ) -> None:
         """Initialize GitManager.
-        
+
         :param default_pat_token_env: Default environment variable name containing PAT token
         :param default_ssh_key_path: Default path to SSH private key
         """
@@ -43,11 +43,11 @@ class GitManager:
         :raises GitError: If cloning fails
         """
         pat_token = self._get_pat_token(pat_token_env)
-        
+
         auth_url = self._inject_auth_token(clone_url, pat_token)
-        
+
         ssh_key = ssh_key_path or self.default_ssh_key_path
-        
+
         USER_LOG.progress_message("Cloning", clone_url)
 
         cmd = [
@@ -59,7 +59,9 @@ class GitManager:
             str(destination),
         ]
 
-        returncode, stdout, stderr = self._run_command(cmd, ssh_key_path=ssh_key)
+        returncode, stdout, stderr = self._run_command(
+            cmd, ssh_key_path=ssh_key
+        )
 
         if returncode != 0:
             clean_error = stderr.replace(auth_url, clone_url)
@@ -70,12 +72,12 @@ class GitManager:
 
     def _get_pat_token(self, pat_token_env: str | None = None) -> str | None:
         """Get PAT token from environment variable.
-        
+
         :param pat_token_env: Environment variable name, uses default if not provided
         :returns: PAT token or None if not configured
         """
         env_var = pat_token_env or self.default_pat_token_env
-        
+
         if env_var:
             token = os.getenv(env_var)
             if token:
@@ -87,7 +89,7 @@ class GitManager:
 
     def _inject_auth_token(self, url: str, pat_token: str | None) -> str:
         """Inject PAT token into HTTPS URL.
-        
+
         :param url: Original clone URL
         :param pat_token: PAT token to inject
         :returns: URL with token injected (if applicable)
@@ -107,14 +109,13 @@ class GitManager:
 
         # Copy environment and configure SSH if needed
         env = os.environ.copy()
-        
+
         if ssh_key_path:
             expanded_path = os.path.expanduser(ssh_key_path)
             # Use GIT_SSH_COMMAND to specify SSH key
             # -o IdentitiesOnly=yes ensures only this key is used
             env["GIT_SSH_COMMAND"] = (
-                f"ssh -i {expanded_path} "
-                f"-o IdentitiesOnly=yes"
+                f"ssh -i {expanded_path} " f"-o IdentitiesOnly=yes"
             )
             USER_LOG.debug(f"Using SSH key: {expanded_path}")
 

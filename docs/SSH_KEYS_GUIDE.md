@@ -288,7 +288,10 @@ For CI/CD pipelines, consider using **HTTPS with PAT tokens** instead of SSH key
       "pat_token_env": "COMPANY_PAT_TOKEN",
       ...
     }
-  ]
+  ],
+  "git": {
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
+  }
 }
 ```
 

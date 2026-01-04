@@ -152,7 +152,7 @@ docker run -e GITHUB_PAT_TOKEN="ghp_xxxx" your-image
     "clone_depth": 1,
     "default_branches": ["main", "master"],
     "default_protocol": "https",
-    "pat_token_env": "GITHUB_PAT_TOKEN"
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
   }
 }
 ```
@@ -205,7 +205,7 @@ You can use different protocols for different repositories:
   "git": {
     "default_protocol": "ssh",
     "default_ssh_key_path": "~/.ssh/id_ed25519",
-    "pat_token_env": "GITHUB_PAT_TOKEN"
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
   }
 }
 ```
@@ -315,7 +315,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "personal@email.com"
     "default_protocol": "https",
     "default_branches": ["main", "master"],
     "clone_depth": 1,
-    "pat_token_env": "MY_COMPANY_PAT_TOKEN"
+    "default_pat_token_env": "MY_COMPANY_PAT_TOKEN"
   }
 }
 ```
@@ -335,7 +335,7 @@ export MY_COMPANY_PAT_TOKEN="ghp_zzzzzzzzzzzzzzzz"
 
 **Token Priority:**
 1. **Repository-specific token** (`pat_token_env` in repository config) - highest priority
-2. **Global default token** (`pat_token_env` in git config) - fallback
+2. **Global default token** (`default_pat_token_env` in git config) - fallback
 3. **No token** - for public repositories with HTTPS
 
 **Benefits:**
@@ -489,7 +489,7 @@ sync_docs:
 1. Verify token is set: `echo $GITHUB_PAT_TOKEN`
 2. Check token has correct permissions (repo scope)
 3. Ensure token hasn't expired
-4. Verify `pat_token_env` matches your environment variable name
+4. Verify `pat_token_env` (repository-level) or `default_pat_token_env` (global) matches your environment variable name
 
 **Problem:** Token visible in error messages
 

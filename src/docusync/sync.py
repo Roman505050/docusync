@@ -109,7 +109,7 @@ class DocuSync:
         self.config = config
         USER_LOG.verbose = verbose
         self.git_manager = GitManager(
-            default_pat_token_env=config.git.pat_token_env,
+            default_pat_token_env=config.git.default_pat_token_env,
             default_ssh_key_path=config.git.default_ssh_key_path,
         )
         self.file_manager = FileManager()

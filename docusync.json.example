@@ -44,6 +44,6 @@
     "default_branches": ["main", "master"],
     "default_protocol": "ssh",
     "default_ssh_key_path": "~/.ssh/id_ed25519",
-    "pat_token_env": "GITHUB_PAT_TOKEN"
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
   }
 }

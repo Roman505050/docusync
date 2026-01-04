@@ -61,9 +61,9 @@ class GitConfig(BaseModel):
     clone_depth: int = Field(..., ge=1)
     default_branches: list[str] = Field(..., min_length=1)
     default_protocol: Literal["ssh", "https"] = Field(default="ssh")
-    pat_token_env: str | None = Field(
+    default_pat_token_env: str | None = Field(
         default=None,
-        description="Environment variable name containing GitHub PAT token for HTTPS authentication"
+        description="Default environment variable name containing GitHub PAT token for HTTPS authentication"
     )
     default_ssh_key_path: str | None = Field(
         default=None,

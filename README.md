@@ -236,7 +236,7 @@ Array of repositories to sync:
 | `default_branches` | `array` | Default branches to try cloning |
 | `default_protocol` | `string` | Clone protocol: `"ssh"` or `"https"` (default: `"ssh"`) |
 | `default_ssh_key_path` | `string` | Default SSH private key path (optional, e.g., `~/.ssh/id_ed25519`) |
-| `pat_token_env` | `string` | Environment variable name containing GitHub Personal Access Token (optional) |
+| `default_pat_token_env` | `string` | Default environment variable name containing GitHub Personal Access Token (optional) |
 
 #### Authentication & Protocols
 
@@ -260,7 +260,7 @@ Array of repositories to sync:
     "clone_depth": 1,
     "default_branches": ["main", "master"],
     "default_protocol": "https",
-    "pat_token_env": "GITHUB_PAT_TOKEN"
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
   }
 }
 ```
@@ -339,7 +339,7 @@ export GITHUB_PAT_TOKEN="ghp_your_token_here"
   "git": {
     "default_protocol": "ssh",
     "default_ssh_key_path": "~/.ssh/id_ed25519",
-    "pat_token_env": "GITHUB_PAT_TOKEN"
+    "default_pat_token_env": "GITHUB_PAT_TOKEN"
   }
 }
 ```
@@ -354,7 +354,7 @@ export GITHUB_PAT_TOKEN="ghp_default_token"
 
 **Priority for authentication:**
 - **SSH:** Repository `ssh_key_path` → Global `default_ssh_key_path` → System default
-- **HTTPS:** Repository `pat_token_env` → Global `pat_token_env` → No token
+- **HTTPS:** Repository `pat_token_env` → Global `default_pat_token_env` → No token
 
 ## 🎨 Docusaurus Integration
 

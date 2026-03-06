@@ -1,6 +1,6 @@
 [project]
 name = "docusync"
-version = "2.2.0"
+version = "2.2.1"
 description = "CLI tool for syncing documentation from multiple repositories for Docusaurus"
 readme = "README.md"
 requires-python = ">=3.12"

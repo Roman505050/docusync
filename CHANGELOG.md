@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-03-06
+
+### Fixed
+- Prevented logging of PAT tokens in URLs within error and debug messages
+
 ## [2.2.0] - 2026-02-18
 
 ### Changed
@@ -79,3 +84,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Uses `display_name`, `position`, and `description` from configuration
   - Follows Docusaurus category format with `generated-index` link type
   - Enables automatic index page generation in Docusaurus
+
+
+[2.2.1]: https://github.com/docusync/docusync/compare/v2.2.0...v2.2.1
+[2.2.0]: https://github.com/docusync/docusync/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/docusync/docusync/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/docusync/docusync/releases/tag/v2.0.0

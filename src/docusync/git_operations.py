@@ -1,12 +1,30 @@
 """Git operations for DocuSync."""
 
 import os
+import re
 import subprocess
 from pathlib import Path
 
 from docusync.constants import GIT_COMMAND_TIMEOUT
 from docusync.exceptions import GitError
 from docusync.logger import USER_LOG
+
+
+# Pattern: https://TOKEN@host - masks credentials in URLs
+_URL_CREDENTIAL_PATTERN = re.compile(r"https://[^@]+@")
+
+
+def _mask_sensitive_url(url: str) -> str:
+    """Mask token/credentials in HTTPS URL for safe logging."""
+    return _URL_CREDENTIAL_PATTERN.sub("https://***@", url)
+
+
+def _mask_command(cmd: list[str]) -> str:
+    """Return command string with sensitive URLs masked."""
+    return " ".join(
+        _mask_sensitive_url(arg) if "://" in arg and "@" in arg else arg
+        for arg in cmd
+    )
 
 
 class GitManager:
@@ -64,7 +82,9 @@ class GitManager:
         )
 
         if returncode != 0:
-            clean_error = stderr.replace(auth_url, clone_url)
+            clean_error = _mask_sensitive_url(
+                stderr.replace(auth_url, clone_url)
+            )
             raise GitError(f"Failed to clone {clone_url}: {clean_error}")
 
         USER_LOG.debug(f"Clone output: {stdout}")
@@ -105,7 +125,7 @@ class GitManager:
         cwd: Path | None = None,
         ssh_key_path: str | None = None,
     ) -> tuple[int, str, str]:
-        USER_LOG.command_output(" ".join(cmd))
+        USER_LOG.command_output(_mask_command(cmd))
 
         # Copy environment and configure SSH if needed
         env = os.environ.copy()
@@ -130,7 +150,9 @@ class GitManager:
             )
             return result.returncode, result.stdout, result.stderr
         except subprocess.TimeoutExpired as e:
-            raise GitError(f"Git command timed out: {' '.join(cmd)}") from e
+            raise GitError(
+                f"Git command timed out: {_mask_command(cmd)}"
+            ) from e
         except Exception as e:
             raise GitError(f"Failed to run git command: {e}") from e
         finally:
